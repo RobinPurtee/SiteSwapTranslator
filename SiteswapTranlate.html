@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Global to Local Multi Handed Siteswap Translator</title>
+</head>
+<body>
+  <script type="text/javascript" src="SiteswapTranslater.js"></script>
+  <script type="text/javascript">
+    function calcLocal() {
+      var numberOfJugglers = parseInt(document.getElementById("numberOfJugglers").value);
+      var patternSwaps = document.getElementById("siteswap").value;
+      var pattern = new Pattern(numberOfJugglers, patternSwaps);
+      document.getElementById("numProps").innerHTML = pattern.numProps;
+      document.getElementById("localSwap").innerHTML = pattern.toLocalSiteswapHTMLString();
+
+    }
+
+  </script>
+
+  <p>
+    Numer of Jugglers: <input id="numberOfJugglers" type="number" value="2" /><br/>
+    Enter Siteswap:<input id="siteswap" type="text" />
+                   <input id="calcLocalBtn" type="button" value="Calculate Local" onclick="calcLocal()" />
+  </p>
+  <hr />
+  <p>
+    Number of props in the pattern: <span id="numProps">&nbsp;</span>
+  </p>
+  <p >
+    Local Siteswap: <span id="localSwap">&nbsp;</span>
+  </p>
+
+
+</body>
+</html>
