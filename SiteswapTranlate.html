@@ -17,11 +17,11 @@
 
   </script>
 
-  <p>
+  <form onsubmit="calcLocal();return false">
     Numer of Jugglers: <input id="numberOfJugglers" type="number" value="2" /><br/>
     Enter Siteswap:<input id="siteswap" type="text" />
-                   <input id="calcLocalBtn" type="button" value="Calculate Local" onclick="calcLocal()" />
-  </p>
+    <button type="submit">Calculate Local</button>
+  </form>
   <hr />
   <p>
     Number of props in the pattern: <span id="numProps">&nbsp;</span>
