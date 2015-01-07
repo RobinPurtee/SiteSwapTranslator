@@ -1,7 +1,8 @@
-﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Global to Local Multi Handed Siteswap Translator</title>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="index.css" />
+    <title>Rick Purtee's Global to Local Multi Handed Siteswap Translator</title>
 </head>
 <body>
   <script type="text/javascript" src="SiteswapTranslater.js"></script>
@@ -68,35 +69,40 @@
     The second is a long description of each toss in a full rotation if the pattern.
   </p>
   <p>
-    To make JoePass work properly the first toss needs to be a straight pass. This calculator will roll the starting location of the siteswap and/or change the hand order to insure this is true.&nbsp;
+    To make JoePass work properly the first toss needs to be a straight 
+pass. This calculator will roll the starting location of the siteswap 
+and/or change the hand order to insure this is true.&nbsp;
   </p>
   <p>
-    <strong>Note:</strong> In order to used the JoePass string you will need to add the following lines at the start of the pass file;<br />
-    #sx       ! use extensions to vanilla siteswap <br />
-    #d 2 0.5	! Juggler B throws 0.5 beats later than Juggler A <br />
+    <strong>Note:</strong> In order to used the JoePass string you will need to add the following lines at the start of the pass file;<br>
+    #sx       ! use extensions to vanilla siteswap <br>
+    #d 2 0.5	! Juggler B throws 0.5 beats later than Juggler A <br>
     #D -		! Disable the correction of the pass value by the amount of the delay 
   </p>
+ <p>
+    <strong>Note:</strong> some development is still going on, on <a href='https://github.com/JugglerRick/SiteSwapTranslator.git'>https://github.com/JugglerRick/SiteSwapTranslator.git</a>
+<br> (and some errors exist) </br>
+  </p>
   <form onsubmit="calcLocal();return false">
-    Number of Jugglers: <input id="numberOfJugglers" type="number" value="2" min="2" /><br/>
-    Enter Global Siteswap:<input id="siteswap" type="text" />
-    <button type="submit">Calculate Local</button><br/>
-    <input id="rollLeftBtn" type="button" value="&lt;- Roll Left" onclick="rollLeft()" />
-    <input id="rollRightBtn" type="button" value="Roll Right -&gt;" onclick="rollRight()"/>
+    Number of Jugglers: <input id="numberOfJugglers" value="2" min="2" type="number"><br>
+    Enter Global Siteswap:<input value="52413" id="siteswap" type="text">
+    <button type="submit">Calculate Local</button><br>
+    <input id="rollLeftBtn" value="&lt;- Roll Left" onclick="rollLeft()" type="button">
+    <input id="rollRightBtn" value="Roll Right -&gt;" onclick="rollRight()" type="button">
   </form>
-  <p id="errorMessage">
-    &nbsp;
-  </p>
-  <hr />
+  <p id="errorMessage">&nbsp;</p>
+  <hr>
   <p>
-    Number of props in the pattern: <span id="numProps">&nbsp;</span>
-  </p>
-  <p >
-    JoePass Siteswap: <span id="localSwap">&nbsp;</span>
+    Number of props in the pattern: <span id="numProps">3</span>
   </p>
   <p>
-    Siteswap description:<br /> <span id="description">&nbsp;</span>
+    JoePass Siteswap: <span id="localSwap">&lt; <!---0.5p 1.5px 2.5p | 2.5px 0.5px 1.5p --> &gt;</span>
+  </p>
+  <p>
+    Siteswap description:<br> <span id="description">  <!--- Juggler A<br>straight zap<br> diagonal zap<br> straight zap<br> straight zap<br> diagonal zap<br> straight zap<br> <br>Juggler B<br>diagonal zap<br> diagonal zap<br> straight zap<br> diagonal zap<br> diagonal zap<br> straight zap<br> --> </span>
   </p>
 
 
-</body>
-</html>
+
+
+</body></html>
