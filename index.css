@@ -1,0 +1,40 @@
+body{font-family: Gill, Helvetica, sans-serif; background-color: #DDDDFF; color: #000000} 
+
+h1{ color: navy; }
+
+
+       tr 	{ 	text-align: left;
+			border-width: 1px 1px 1px 1px;
+			background-color: #00FFFF ;color: #000055;
+		}
+
+ 
+form table tr, form table td { background-color: #55FF55 ;color: #000000;} 
+a.description{
+    position:relative; /*this is the key*/
+    z-index:24; /* background-color:#ccc; */
+    color:#005500; 
+    text-decoration:none}
+a.verwijzing{
+    position:relative; /*this is the key*/
+    z-index:24; /* background-color:#ccc; */
+    color:#005500; 
+    text-decoration:none}
+
+/*  :hover  {color:#500; background-color:#fff} */
+a.verwijzing:hover{z-index:25; font-weight:bold; color:navy;  }
+ 
+a.verwijzing span{display: none}
+
+a.verwijzing:hover span{ /*the span will display just on :hover state*/
+    display:block;
+    position:absolute;
+    top:2em; left:2em; width:12em;
+    border:1px solid #0cf;
+    background-color:#cff; color:#000055;
+    text-align: center}
+
+a.verwijzing:link	{	color:		bleu   }
+a.verwijzing:hover	{	font-weight: bold	
+				color: 		navy	}
+
