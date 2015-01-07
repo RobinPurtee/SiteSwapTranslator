@@ -37,14 +37,14 @@ Siteswap.prototype.toString = function () {
  * Pattern properties are;
  * numJugglers - the number of jugglers in the pattern
  * numHands - the number of hands in the pattern (2 per juggler is assumed)
- * swaps - an array containing the siteswap values
+ * swaps - an array containing the siteswap values (a.k.a. global siteswap values)
  * numProps - the number of props used in the pattern
- * siteswaps - an array of Siteswap objects that represent the local tosses for the pattern
+ * siteswaps - an array of Siteswap objects that represent the local tosses for the pattern (a.k.a Prechac notation)
  */
 
 function Pattern(numberOfJugglers, siteswapStr) {
   if(numberOfJugglers < 2){
-    throw "There must at least 2 juggler in the pattern";
+    throw "There must be at least 2 jugglers in the pattern";
   }
   this.numJugglers = numberOfJugglers; 
   this.numHands = 2 * this.numJugglers;
@@ -64,7 +64,7 @@ function Pattern(numberOfJugglers, siteswapStr) {
       throw "Invalid siteswap; No passes will be made."
     }
   }
-  // this insures that the pass is straight
+  // this ensures that the pass is straight
   if(this.isDiagonal(this.siteswaps[0])) {
     // if the first pass is diagonal, inverting the hand order to right-left-left-right will swap
     // the juggler's roles.
@@ -112,15 +112,16 @@ Pattern.prototype.setSwaps = function (siteswapStr) {
   this.validateSiteswap();
 }
 
-/** Calculate the number of props in pattern from the siteswap
+/** Calculate the number of props in pattern from the siteswapcalculateNumberOfProps
  * @return the number of objects in the pattern
  * the return value must be a whole integer value for this to be a valid siteswap
  */
 
 Pattern.prototype.calculateNumberOfProps = function () {
   if(0 === this.swaps.length) {
-    throw "Unable to calculate the number of objects siteswap is invalid";
+    throw "Unable to calculate the number of objects siteswap is empty";
   }
+
   var total = 0;
   var average = 0;
   for(var i = 0 ; i < this.swaps.length ; ++i) {
@@ -130,16 +131,21 @@ Pattern.prototype.calculateNumberOfProps = function () {
   return average;
 }
 
-/** Validate the currently set siteswap 
+/** Validate the currently set global siteswap 
  * @return boolean - true if the it is a valid siteswap, else false
  */
 
 Pattern.prototype.validateSiteswap = function () {
-  // the modulo 1 of an integer is 0
-  if((this.calculateNumberOfProps() % 1) !== 0) {
-    throw "Invalid siteswap entered";
-  }
-  return true;
+  	var catch_position,
+	catches = [],
+	period = this.swaps.length;
+	for (var i = 0; i < period; ++i) {
+		catch_position = (i + this.swaps[i]) % period;
+		if (catches[catch_position])
+			throw "Invalid siteswap entered: a throw at height "+this.swaps[i]+" at position "+(i+1)+" will land at the same time as a previous throw";
+		catches[catch_position] = true;
+	}
+	return true;
 }
 
 /** Creates the array of Siteswaps from the swaps list and stores it in 
@@ -148,10 +154,11 @@ Pattern.prototype.validateSiteswap = function () {
 
 Pattern.prototype.calculateSiteswaps = function() {
   this.validateSiteswap();
-  var numSites = this.swaps.length * this.numHands;//this.numJugglers;
-  var curSwap = 0;
+  var numSites = LCM([this.swaps.length , this.numHands]);//this.numJugglers;
+  // var numSites = this.swaps.length * this.numHands;//this.numJugglers;
+ var curSwap = 0;
   var curHand = 0;
-  this.siteswaps = new Array(numSites);
+  this.siteswaps = [];// new Array(numSites);
 
   for(i = 0 ; i < numSites ; ++i) {
     this.siteswaps[i] = new Siteswap(this, curHand, curSwap);
@@ -238,7 +245,7 @@ Pattern.prototype.siteswapToJoePassString = function (siteswap) {
 Pattern.prototype.toJoePassString = function() {
   var str = "&lt ";
   var juggler = 0;
-  var numberOfSiteswaps = this.swaps.length * this.numJugglers;
+  var numberOfSiteswaps = LCM([this.swaps.length , this.numJugglers]);
   while(juggler < this.numJugglers) {
     for(var i = juggler ; i < numberOfSiteswaps ; i += this.numJugglers) {
       str += this.siteswapToJoePassString(this.siteswaps[i]) + " ";
@@ -316,4 +323,26 @@ Pattern.prototype.toDescription = function () {
     }
   }
   return str;
+}
+
+/* calculate the lowest common multiple
+*/
+
+function LCM(A)  // A is an integer array (e.g. [-50,25,-45,-18,90,447])
+{   
+    var n = A.length, a = Math.abs(A[0]);
+    for (var i = 1; i < n; i++)
+     { var b = Math.abs(A[i]), c = a;
+       // find the greatest common divisor of a and b
+	while (a && b)
+       {	if( a > b)
+		{ a = a%b ;}
+		else
+		{ b = b%a; } 
+	}
+	// calculate the lowest common multiple
+	// 0==b or 0==a, so gcm = a+b
+       a = Math.abs(c*A[i])/(a+b);
+     }
+    return a;
 }
