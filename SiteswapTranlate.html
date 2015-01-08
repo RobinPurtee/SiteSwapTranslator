@@ -6,28 +6,95 @@
 <body>
   <script type="text/javascript" src="SiteswapTranslater.js"></script>
   <script type="text/javascript">
-    function calcLocal() {
+    var globalPattern;
+    function outputSiteswap(pattern) {
+      document.getElementById("errorMessage").innerHTML = "&nbsp;";
+      document.getElementById("siteswap").value = pattern.toString();
+      document.getElementById("numProps").innerHTML = pattern.numProps;
+      document.getElementById("localSwap").innerHTML = pattern.toJoePassString();
+      document.getElementById("description").innerHTML = pattern.toDescription();
+    }
+
+    function outputError(message) {
+      document.getElementById("errorMessage").innerHTML = message;
+      document.getElementById("numProps").innerHTML = "&nbsp;";
+      document.getElementById("localSwap").innerHTML = "&nbsp;";
+      document.getElementById("description").innerHTML = "&nbsp;";
+    }
+
+    function createPattern() {
       var numberOfJugglers = parseInt(document.getElementById("numberOfJugglers").value);
       var patternSwaps = document.getElementById("siteswap").value;
       var pattern = new Pattern(numberOfJugglers, patternSwaps);
-      document.getElementById("numProps").innerHTML = pattern.numProps;
-      document.getElementById("localSwap").innerHTML = pattern.toLocalSiteswapHTMLString();
-
+      return pattern;
     }
 
-  </script>
+    function calcLocal() {
+      try {
+        globalPattern = createPattern();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
 
+    function rollLeft() {
+      try{
+        globalPattern.rollLeft();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+
+    function rollRight() {
+      try {
+        globalPattern.rollRight();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+
+
+  </script>
+  <h1 style="text-align: center">Multi Hand Siteswap Translator</h1>
+  <p>
+    This will translate a global siteswap into its local parts in 2 ways. 
+    The first is the format that is used by the JoePass passing animation program. 
+    The second is a long description of each toss in a full rotation if the pattern.
+  </p>
+  <p>
+    To make JoePass work properly the first toss needs to be a straight pass. This calculator will roll the starting location of the siteswap and/or change the hand order to insure this is true.&nbsp;
+  </p>
+  <p>
+    <strong>Note:</strong> In order to used the JoePass string you will need to add the following lines at the start of the pass file;<br />
+    #sx       ! use extensions to vanilla siteswap <br />
+    #d 2 0.5	! Juggler B throws 0.5 beats later than Juggler A <br />
+    #D -		! Disable the correction of the pass value by the amount of the delay 
+  </p>
   <form onsubmit="calcLocal();return false">
-    Numer of Jugglers: <input id="numberOfJugglers" type="number" value="2" /><br/>
-    Enter Siteswap:<input id="siteswap" type="text" />
-    <button type="submit">Calculate Local</button>
+    Number of Jugglers: <input id="numberOfJugglers" type="number" value="2" min="2" /><br/>
+    Enter Global Siteswap:<input id="siteswap" type="text" />
+    <button type="submit">Calculate Local</button><br/>
+    <input id="rollLeftBtn" type="button" value="&lt;- Roll Left" onclick="rollLeft()" />
+    <input id="rollRightBtn" type="button" value="Roll Right -&gt;" onclick="rollRight()"/>
   </form>
+  <p id="errorMessage">
+    &nbsp;
+  </p>
   <hr />
   <p>
     Number of props in the pattern: <span id="numProps">&nbsp;</span>
   </p>
   <p >
-    Local Siteswap: <span id="localSwap">&nbsp;</span>
+    JoePass Siteswap: <span id="localSwap">&nbsp;</span>
+  </p>
+  <p>
+    Siteswap description:<br /> <span id="description">&nbsp;</span>
   </p>
 
 
