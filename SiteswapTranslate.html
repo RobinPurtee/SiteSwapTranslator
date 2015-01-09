@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="index.css" />
+    <title>Rick Purtee's Global to Local Multi Handed Siteswap Translator</title>
+</head>
+<body>
+  <script type="text/javascript" src="SiteswapTranslater.js"></script>
+  <script type="text/javascript">
+    var globalPattern;
+    function outputSiteswap(pattern) {
+      document.getElementById("errorMessage").innerHTML = "&nbsp;";
+      document.getElementById("siteswap").value = pattern.toString();
+      document.getElementById("numProps").innerHTML = pattern.numProps;
+      document.getElementById("globalPeriod").innerHTML = pattern.swaps.length;
+      document.getElementById("setHands").innerHTML = pattern.showHandOrderButton();
+      document.getElementById("individualPeriod").innerHTML = pattern.individualPeriod;
+      document.getElementById("localSwap").innerHTML = pattern.toPrechacString();
+      document.getElementById("JoePassInput").innerHTML = pattern.toJoePassString();
+      document.getElementById("description").innerHTML = pattern.toDescription();
+    }
+
+    function outputError(message) {
+      document.getElementById("errorMessage").innerHTML = message;
+      document.getElementById("numProps").innerHTML = "&nbsp;";
+      document.getElementById("globalPeriod").innerHTML = "&nbsp;";
+      document.getElementById("setHands").innerHTML = "&nbsp;";
+      document.getElementById("individualPeriod").innerHTML ="&nbsp;";
+      document.getElementById("localSwap").innerHTML = "&nbsp;";
+      document.getElementById("JoePassInput").innerHTML = "&nbsp;";
+      document.getElementById("description").innerHTML = "&nbsp;";
+    }
+
+    function createPattern() {
+      var numberOfJugglers = parseInt(document.getElementById("numberOfJugglers").value);
+      var patternSwaps = document.getElementById("siteswap").value;
+      var pattern = new Pattern(numberOfJugglers, patternSwaps);
+      return pattern;
+    }
+
+    function calcLocal() {
+      try {
+        globalPattern = createPattern();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+
+    function rollLeft() {
+      try{
+        globalPattern = createPattern();
+	globalPattern.rollLeft();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+
+    function rollRight() {
+      try {
+        globalPattern = createPattern();
+        globalPattern.rollRight();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+
+    function shiftToFirstPass() {
+      try {
+        globalPattern = createPattern();
+        globalPattern.shiftToFirstPass();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+   function setOddHands() {
+      try {
+        globalPattern = createPattern();
+        globalPattern.setOddHands();
+        globalPattern.calculateSiteswaps();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+   function setEvenHands() {
+      try {
+        globalPattern = createPattern();
+        globalPattern.setEvenHands();
+        globalPattern.calculateSiteswaps();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
+
+  </script>
+  <h1 style="text-align: center">Multi Hand Siteswap Translator</h1>
+(Thanks to <a href="http://manipulatormanor.net/juggling/SiteswapTranslate.html">Rick Purtee</a>)<p>
+   This will translate a global siteswap into its local parts in 3 ways. 
+<ul>   <li>  The first is the notation used for social siteswaps (formerly called "Prechacs", but Mr Prechac claims that he wasn't the inventor).
+</li><li>     The second is a long description of each toss in a full rotation of the pattern. <br>
+   It describes which hand throws to which hand!<br>
+</li><li>      The third format that is used by the <a href='http://koelnvention.de/w/?page_id=151'>JoePass</a> passing animation program. (although Joepass can generate such code very well by itself: In the editor window that comes with joepass! type a valid solo siteswap, Start it as a 3 person pattern with ESC 3.<br>
+</li>  </ul>
+
+ <p>
+    <strong>Note:</strong> if development is still going look at, on <a href='https://github.com/JugglerRick/SiteSwapTranslator.git'>https://github.com/JugglerRick/SiteSwapTranslator.git</a>
+  </p>
+  <form onsubmit="calcLocal();return false">
+    Number of Jugglers: <input id="numberOfJugglers" value="2" min="2" type="number"><br>
+    Enter Global Siteswap:<input value="52413" id="siteswap" type="text">
+    <button type="submit">Calculate Local</button><br>
+    <input id="rollLeftBtn" value="&lt;- Roll Left" onclick="rollLeft()" type="button">
+    <input id="rollRightBtn" value="Roll Right -&gt;" onclick="rollRight()" type="button">
+    <input id="shiftToFirstPassBtn" value="&lt;- Roll Left untill the first pass" onclick="shiftToFirstPass()" type="button"> <br>
+ 	<span id="setHands"></span> 
+  </form>
+  <hr>  <span id="errorMessage">&nbsp;</span>
+
+  <p>
+    Number of props in the pattern: <span id="numProps"></span>
+  </p>
+  <p>
+    Period for an individual juggler: <span id="individualPeriod"></span>
+  </p>
+  <p>
+    Period of the global siteswap: <span id="globalPeriod"></span>
+  </p>
+  <p>
+   <h3> social siteswap notation:</h3>  <span id="localSwap">&lt; <!---0.5p 1.5px 2.5p | 2.5px 0.5px 1.5p --> &gt;</span>
+  </p>
+  <p>
+  <h3>     Siteswap description:  </h3>  <span id="description">  <!--- Juggler A<br>straight zap<br> diagonal zap<br> straight zap<br> straight zap<br> diagonal zap<br> straight zap<br> <br>Juggler B<br>diagonal zap<br> diagonal zap<br> straight zap<br> diagonal zap<br> diagonal zap<br> straight zap<br> --> </span>
+  </p>
+   <h3> JoePass Siteswap:</h3>  <span id="JoePassInput">&lt; <!---0.5p 1.5px 2.5p | 2.5px 0.5px 1.5p --> &gt;</span>
+  </p>
+
+
+
+
+</body></html>
