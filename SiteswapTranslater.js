@@ -1,35 +1,38 @@
 ﻿/** Siteswap object creation function
  * @param pattern - the pattern object that this siteswap will be used by
- * @param source - the source hand of the swap
+ * @param sourceHand - the hand that throws the swap
  * @param swapIndex - the index into the array of swaps in the pattern
  * Siteswap properties are;
- * source - the hand that the prop is passed from
- * destination - the hand the prop is passed to
+ * sourceHand - the hand that the prop is passed from
+ * destinationHand - the hand that the prop is passed to
  * swap - the siteswap of the pass
  * isPass - is this a pass to another juggler or a self
+ * isDiagonal - true if 
  */
 
-function Siteswap(pattern, source, swapIndex) {
-  this.source = source;
-  this.destination = (source + pattern.swaps[swapIndex]) % pattern.numHands;
+function Siteswap(pattern, sourceHand, swapIndex) {
+  this.sourceHand = sourceHand; 
+  this.destinationHand = (sourceHand + pattern.swaps[swapIndex]) % pattern.numHands;// values can be "right" or "left"
   this.swap = pattern.swaps[swapIndex] / pattern.numJugglers;
-  this.isPass = (this.source % pattern.numJugglers) != (this.destination % pattern.numJugglers);
+  // this.isPass = (this.source % pattern.numJugglers) != (this.destinationHand % pattern.numJugglers);
+  this.isPass = (0 != pattern.swaps[swapIndex] % pattern.numJugglers); // if 0, sourceHand = destinationHand
+  this.isDiagonal = (pattern.hands[this.sourceHand] == pattern.hands[this.destinationHand] ); // pattern.hands has values "right" or "left"
 }
 
 /** default string conversion for a siteswap
  * this returns a string containing the swap value and if this is a pass
  * a letter representing the destination hand. Hands are lettered from 'a'
  * to the letter representing the number of hands
- */
+ 
 
 Siteswap.prototype.toString = function () {
-  var str = this.swap.toString();
+  var str = (Math.round(this.swap*100)/100).toString();
   if(this.isPass) {
-    str += String.fromCharCode(('a').charCodeAt(0) + this.destination);
+    str += String.fromCharCode(('a').charCodeAt(0) + this.destinationHand);
   }
   return str;
 }
-
+*/
 
 /** Pattern object creation function
  * @param the number of jugglers in the pattern
@@ -41,13 +44,16 @@ Siteswap.prototype.toString = function () {
  * numProps - the number of props used in the pattern
  * siteswaps - an array of Siteswap objects that represent the local tosses for the pattern (a.k.a Prechac notation)
  */
-
 function Pattern(numberOfJugglers, siteswapStr) {
+  // define the names of the hands
+  this.handsEnum = [  "right", "left" ];
+
   if(numberOfJugglers < 2){
     throw "There must be at least 2 jugglers in the pattern";
   }
   this.numJugglers = numberOfJugglers; 
-  this.numHands = 2 * this.numJugglers;
+  this.numHands = this.handsEnum.length * this.numJugglers;
+  this.setHands();
   this.setSwaps(siteswapStr);
   this.numProps = this.calculateNumberOfProps();
   // normal hand order is right-right-left-left
@@ -56,36 +62,77 @@ function Pattern(numberOfJugglers, siteswapStr) {
   // In the following lines it may seem inefficient to recalculate the siteswaps every time
   // however given what it would take to reshuffle the values it is pretty much the same.
   // this insures that the pattern starts with a pass
-  var numSwaps = this.swaps.length;
-  while(!this.siteswaps[0].isPass) {
-    this.rollLeft();
-    --numSwaps;
-    if(0 >= numSwaps) {
-      throw "Invalid siteswap; No passes will be made."
-    }
-  }
-  // this ensures that the pass is straight
+  // 	this.shiftToFirstPass(); (this is now a separate button)
+ 
+  // ONLY IF THERE ARE 2 JUGGLERS: this ensures that the pass is straight, 
   if(this.isDiagonal(this.siteswaps[0])) {
     // if the first pass is diagonal, inverting the hand order to right-left-left-right will swap
     // the juggler's roles.
+
     this.invertHandOrder = true;
     this.calculateSiteswaps();
   }
 
 }
+Pattern.prototype.setHands = function() 
+{
+	if (0==this.numJugglers%this.handsEnum.length)
+	{	// even
+		this.setEvenHands();
+	}
+	else
+	{	// odd
+		this.setOddHands();
+	}
 
-/**  returns a string of the current swaps
+}
+/** set hands for an odd number of jugglers:
+    R L R L R L
+    (crossing/uncrossing is the same for all jugglers)
  */
+Pattern.prototype.setOddHands = function() 
+{	  this.hands = [];
+	index = 0;
+	for (var juggler = 0; juggler < this.numJugglers; juggler++)
+	{
+		for (hand in this.handsEnum)
+		{	this.hands[index]=hand;
+			index++;
+		}
+	}
+}
+
+/** set hands for an even number of jugglers:
+    R R R R L L L L
+    (not all jugglers can cross/uncross in the same situations)
+ */
+Pattern.prototype.setEvenHands = function() 
+{	this.hands = [];
+	index = 0;
+	for (hand in this.handsEnum)
+	{
+		for (var juggler = 0; juggler < this.numJugglers; juggler++)
+		{	this.hands[index] =hand;
+			index++;
+		}
+	}
+}
 
 Pattern.prototype.toString = function() {
   var retStr = '';
   if(this.swaps.length > 0) {
     for(var curSwap = 0 ; curSwap < this.swaps.length ; ++curSwap) {
-      retStr += this.swaps[curSwap].toString();
+	if (this.swaps[curSwap]<10)
+      	{	retStr += this.swaps[curSwap].toString();
+	}
+	else // convert 10 to a, 11 to b, etc.
+	{
+		retStr += String.fromCharCode(this.swaps[curSwap]-10 + ('a').charCodeAt(0));
+	}
     }
   }
   else {
-    retStr = "There is currently no swaps set";
+    retStr = "There is currently no site-swap set";
   }
   return retStr;
 }
@@ -102,14 +149,30 @@ Pattern.prototype.setSwaps = function (siteswapStr) {
   for(i = 0 ; i < siteswapStr.length ; ++i) {
     this.swaps[i] = parseInt(siteswapStr[i], 10);
     if(isNaN(this.swaps[i])) {
-      var char = siteswapStr[i].toUpperCase();
-      this.swaps[i] = ((char).charCodeAt(0) - ('A').charCodeAt(0)) + 10;
+      var char = siteswapStr[i].toLowerCase();
+      this.swaps[i] = ((char).charCodeAt(0) - ('a').charCodeAt(0)) + 10;
       if(isNaN(this.swaps[i])) {
         throw "Invalid character used in siteswap string";
       }
     }
   }
   this.validateSiteswap();
+}
+
+/** shift the global site-swap to the left until the first throw is a pass
+ * NOTE: this only works if Pattern.calculateSiteswaps(); has been performed !
+ */
+
+Pattern.prototype.shiftToFirstPass = function () {
+  var numSwaps = this.swaps.length;
+  while(!this.siteswaps[0].isPass) {
+    this.rollLeft();
+    --numSwaps;
+    if(0 >= numSwaps) {
+      throw "No passes will be made."
+    }
+  }
+
 }
 
 /** Calculate the number of props in pattern from the siteswapcalculateNumberOfProps
@@ -194,45 +257,42 @@ Pattern.prototype.rollLeft = function () {
 }
 
 /** test if the given siteswap is a diagonal pass
- * @param the siteswap to test if it is a diagonal pass
- * @return true if the given siteswap is a pass else false
+ * @return true if the given siteswap is a pass from R to R or L to L 
  */
 
 Pattern.prototype.isDiagonal = function (siteswap) {
-  var bRet = siteswap.isPass;
-  if(bRet) {
-    if(this.invertHandOrder) {
-      // using a hand order of right-left-left-right
-      // if the source and destination are on oppose sides of the number juggler 
-      bRet = (siteswap.source < this.numJugglers && siteswap.destination >= this.numJugglers) ||
-             (siteswap.source >= this.numJugglers && siteswap.destination < this.numJugglers);
-    }
-    else {
-      // using a hand order of right-right-left-left
-      // if both the source and destination are on either side of that line then this must be a diagonal pass
-      bRet = (siteswap.source < this.numJugglers && siteswap.destination < this.numJugglers) ||
-             (siteswap.source >= this.numJugglers && siteswap.destination >= this.numJugglers);
-    }
-  }
-  return bRet;
+ return siteswap.isDiagonal;
+}
+
+/** test if the given siteswap is should have an 'x' appended to the pass,
+  when used as input for Joepass
+ */
+
+Pattern.prototype.requiresCrossSign = function (siteswap) {
+ var integerPart = Math.floor( Math.round(siteswap.swap * 100) / 100); // 
+ if( siteswap.isDiagonal )
+	return (0!=integerPart%this.handsEnum.length);
+ else
+	return (0==integerPart%this.handsEnum.length);
 }
 
 /** create a string for a siteswap in a JoePass format
  * @param the siteswap to create the string for
  * @return the string that represents the siteswap
+
  */
 
 Pattern.prototype.siteswapToJoePassString = function (siteswap) {
-  var str = siteswap.swap.toString();
+  var str = (Math.round(siteswap.swap*100)/100).toString();
   if(siteswap.isPass) {
     str += 'p';
-    if(this.isDiagonal(siteswap)){
+    if(this.requiresCrossSign(siteswap)){
       str += 'x';
     }
     if(this.numJugglers > 2) {
       // if there are more than 2 jugglers there needs to be a destination juggler
       str += ':';
-      str += (siteswap.destination % this.numJugglers) + 1;
+      str += (siteswap.destinationHand % this.numJugglers) + 1;
     }
   }
   return str;
@@ -303,6 +363,7 @@ Pattern.prototype.siteswapToDescription = function (siteswap) {
   else {
     str += "quad (or higher)";
   }
+ //  str += ' '+this.handsEnum[siteswap.sourceHand]+' --> '+this.handsEnum[siteswap.destinationHand];
   return str;
 }
 
