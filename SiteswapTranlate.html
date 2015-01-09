@@ -42,7 +42,8 @@
 
     function rollLeft() {
       try{
-        globalPattern.rollLeft();
+        calcLocal();
+	globalPattern.rollLeft();
         outputSiteswap(globalPattern);
       }
       catch(error) {
@@ -52,6 +53,7 @@
 
     function rollRight() {
       try {
+        calcLocal();
         globalPattern.rollRight();
         outputSiteswap(globalPattern);
       }
@@ -60,6 +62,16 @@
       }
     }
 
+    function shiftToFirstPass() {
+      try {
+        calcLocal();
+        globalPattern.shiftToFirstPass();
+        outputSiteswap(globalPattern);
+      }
+      catch(error) {
+        outputError(error);
+      }
+    }
 
   </script>
   <h1 style="text-align: center">Multi Hand Siteswap Translator</h1>
@@ -89,6 +101,7 @@ and/or change the hand order to insure this is true.&nbsp;
     <button type="submit">Calculate Local</button><br>
     <input id="rollLeftBtn" value="&lt;- Roll Left" onclick="rollLeft()" type="button">
     <input id="rollRightBtn" value="Roll Right -&gt;" onclick="rollRight()" type="button">
+    <input id="shiftToFirstPassBtn" value="&lt;- Roll Left untill the first pass" onclick="shiftToFirstPass()" type="button"> 
   </form>
   <p id="errorMessage">&nbsp;</p>
   <hr>
