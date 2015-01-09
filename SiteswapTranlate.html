@@ -12,7 +12,8 @@
       document.getElementById("errorMessage").innerHTML = "&nbsp;";
       document.getElementById("siteswap").value = pattern.toString();
       document.getElementById("numProps").innerHTML = pattern.numProps;
-      document.getElementById("localSwap").innerHTML = pattern.toJoePassString();
+      document.getElementById("localSwap").innerHTML = pattern.toPrechacString();
+      document.getElementById("JoePassInput").innerHTML = pattern.toJoePassString();
       document.getElementById("description").innerHTML = pattern.toDescription();
     }
 
@@ -20,6 +21,7 @@
       document.getElementById("errorMessage").innerHTML = message;
       document.getElementById("numProps").innerHTML = "&nbsp;";
       document.getElementById("localSwap").innerHTML = "&nbsp;";
+      document.getElementById("JoePassInput").innerHTML = "&nbsp;";
       document.getElementById("description").innerHTML = "&nbsp;";
     }
 
@@ -42,7 +44,7 @@
 
     function rollLeft() {
       try{
-        calcLocal();
+        globalPattern = createPattern();
 	globalPattern.rollLeft();
         outputSiteswap(globalPattern);
       }
@@ -53,7 +55,7 @@
 
     function rollRight() {
       try {
-        calcLocal();
+        globalPattern = createPattern();
         globalPattern.rollRight();
         outputSiteswap(globalPattern);
       }
@@ -64,7 +66,7 @@
 
     function shiftToFirstPass() {
       try {
-        calcLocal();
+        globalPattern = createPattern();
         globalPattern.shiftToFirstPass();
         outputSiteswap(globalPattern);
       }
@@ -75,25 +77,19 @@
 
   </script>
   <h1 style="text-align: center">Multi Hand Siteswap Translator</h1>
-  <p>
-    This will translate a global siteswap into its local parts in 2 ways. 
-    The first is the format that is used by the JoePass passing animation program. 
-    The second is a long description of each toss in a full rotation if the pattern.
-  </p>
-  <p>
-    To make JoePass work properly the first toss needs to be a straight 
-pass. This calculator will roll the starting location of the siteswap 
-and/or change the hand order to insure this is true.&nbsp;
-  </p>
-  <p>
-    <strong>Note:</strong> In order to used the JoePass string you will need to add the following lines at the start of the pass file;<br>
-    #sx       ! use extensions to vanilla siteswap <br>
-    #d 2 0.5	! Juggler B throws 0.5 beats later than Juggler A <br>
-    #D -		! Disable the correction of the pass value by the amount of the delay 
-  </p>
+
+   This will translate a global siteswap into its local parts in 3 ways. 
+<ul>   <li>  The first is the notation used for social siteswaps (formerly called "Prechacs", but Mr Prechac claims that he wasn't the inventor).
+</li><li> (2nd: see below)
+</li><li>      The third format that is used by the <a href='http://koelnvention.de/w/?page_id=151'>JoePass</a> passing animation program. (although Joepass can generate such code very well by itself: In the editor window that comes with joepass! type a valid solo siteswap, Start it as a 3 person pattern with ESC 3.<br>
+</li><li>     The second is a long description of each toss in a full rotation of the pattern. <br>
+   It describes which hand throws to which hand!<br>
+    (<em>NOTE</em> the description depends on whether jugglers start with Right or Left. Joepass supposes that the start is R R R R L L L L (all jugglers start with the Right hand).<br>
+    However, if the individual patterns have an odd period, and you try R L R L R L R L (1s juggler starts with Right, second with Left etc.), the pattern will be more symmetric (i.e. if a pass of value 1.67 is straight for A, it is also straight for B and C)
+</li>  </ul>
+
  <p>
-    <strong>Note:</strong> some development is still going on, on <a href='https://github.com/JugglerRick/SiteSwapTranslator.git'>https://github.com/JugglerRick/SiteSwapTranslator.git</a>
-<br> (and some errors exist) </br>
+    <strong>Note:</strong> if development is still going look at, on <a href='https://github.com/JugglerRick/SiteSwapTranslator.git'>https://github.com/JugglerRick/SiteSwapTranslator.git</a>
   </p>
   <form onsubmit="calcLocal();return false">
     Number of Jugglers: <input id="numberOfJugglers" value="2" min="2" type="number"><br>
@@ -109,10 +105,12 @@ and/or change the hand order to insure this is true.&nbsp;
     Number of props in the pattern: <span id="numProps">3</span>
   </p>
   <p>
-    JoePass Siteswap: <span id="localSwap">&lt; <!---0.5p 1.5px 2.5p | 2.5px 0.5px 1.5p --> &gt;</span>
+   <h3> social siteswap notation:</h3>  <span id="localSwap">&lt; <!---0.5p 1.5px 2.5p | 2.5px 0.5px 1.5p --> &gt;</span>
   </p>
   <p>
-    Siteswap description:<br> <span id="description">  <!--- Juggler A<br>straight zap<br> diagonal zap<br> straight zap<br> straight zap<br> diagonal zap<br> straight zap<br> <br>Juggler B<br>diagonal zap<br> diagonal zap<br> straight zap<br> diagonal zap<br> diagonal zap<br> straight zap<br> --> </span>
+  <h3>     Siteswap description:  </h3>  <span id="description">  <!--- Juggler A<br>straight zap<br> diagonal zap<br> straight zap<br> straight zap<br> diagonal zap<br> straight zap<br> <br>Juggler B<br>diagonal zap<br> diagonal zap<br> straight zap<br> diagonal zap<br> diagonal zap<br> straight zap<br> --> </span>
+  </p>
+   <h3> JoePass Siteswap:</h3>  <span id="JoePassInput">&lt; <!---0.5p 1.5px 2.5p | 2.5px 0.5px 1.5p --> &gt;</span>
   </p>
 
 
