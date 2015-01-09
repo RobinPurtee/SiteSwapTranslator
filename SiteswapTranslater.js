@@ -40,37 +40,14 @@ function Pattern(numberOfJugglers, siteswapStr) {
   this.numHands = this.handsEnum.length * this.numJugglers;
   this.setEvenHands();
   this.setSwaps(siteswapStr);
+  this.individualPeriod = LCM([this.swaps.length , this.numJugglers])/this.numJugglers;
   this.numProps = this.calculateNumberOfProps();
   // normal hand order is right-right-left-left
   this.invertHandOrder = false;
   this.calculateSiteswaps();
-  // In the following lines it may seem inefficient to recalculate the siteswaps every time
-  // however given what it would take to reshuffle the values it is pretty much the same.
-  // this insures that the pattern starts with a pass
-  // 	this.shiftToFirstPass(); (this is now a separate button)
- 
-  // ONLY IF THERE ARE 2 JUGGLERS: this ensures that the pass is straight, 
-  if(this.isDiagonal(this.siteswaps[0])) {
-    // if the first pass is diagonal, inverting the hand order to right-left-left-right will swap
-    // the juggler's roles.
-
-    this.invertHandOrder = true;
-    this.calculateSiteswaps();
-  }
 
 }
-Pattern.prototype.setSymmetricHands = function() 
-{
-	if (0==this.numJugglers%this.handsEnum.length)
-	{	// even
-		this.setEvenHands();
-	}
-	else
-	{	// odd
-		this.setOddHands();
-	}
 
-}
 /** set hands for an odd number of jugglers:
     R L R L R L
     (crossing/uncrossing is the same for all jugglers)
@@ -334,6 +311,10 @@ Pattern.prototype.headerForJoePassString = function()
 
 Pattern.prototype.toJoePassString = function() 
 {
+  if (!this.handsSetForJoePass)
+  { return "the hand order is not suitable for Joepass output";
+  }
+  // else
   var str = this.headerForJoePassString();
   for (var count = 0; count < this.siteswaps.length/this.numJugglers ; count++)
   {
@@ -355,9 +336,9 @@ Pattern.prototype.toJoePassString = function()
 Pattern.prototype.toPrechacString = function() {
   var str = "&lt; ";
   var juggler = 0;
-  var numberOfSiteswaps = LCM([this.swaps.length , this.numJugglers]);
+  var groupPeriod = LCM([this.swaps.length , this.numJugglers]);
   while(juggler < this.numJugglers) {
-    for(var i = juggler ; i < numberOfSiteswaps ; i += this.numJugglers) {
+    for(var i = juggler ; i < groupPeriod ; i += this.numJugglers) {
       // str += this.siteswapToPrechacString(this.siteswaps[i]) + " ";
       str += Math.round(100*this.siteswaps[i].swap)/100 + " ";
     }
@@ -467,3 +448,30 @@ function LCM(A)  // A is an integer array (e.g. [-50,25,-45,-18,90,447])
      }
     return a;
 }
+
+Pattern.prototype.showHandOrderButton = function()
+{
+	if (0==this.numJugglers % 2)
+	{ return '(If the number of jugglers is odd, the hand order can be changed)';
+	}
+	//else
+	var description = ' <br>  (<strong>NOTE:</strong> the description depends on whether jugglers start with Right or Left. Joepass supposes that the start is R R R R L L L L (all jugglers start with the Right hand).<br> '
+    +'However, if the individual patterns have an odd period, and you try R L R L R L R L (1s juggler starts with Right, second with Left etc.), the pattern will be more symmetric (i.e. if a pass of value 1.67 is straight for A, it is also straight for B and C)';
+	if (this.handsSetForJoePass)
+	{ return buttonToSetOddHands()+description;
+	}
+	// else
+	{ return buttonToSetEvenHands()+description;
+	}
+	
+}
+function buttonToSetOddHands()
+{
+	return '    <input id="setOddHandsBtn" value="set hands for symmetric output" onclick="setOddHands()" type="button"> ';
+}
+
+function buttonToSetEvenHands()
+{
+	return '    <input id="setEvenHandsBtn" value="set hands for JoePass output" onclick="setEvenHands()" type="button"> ';
+}
+
